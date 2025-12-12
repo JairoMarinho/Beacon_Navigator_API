@@ -39,6 +39,4 @@ public class UsuarioPerfil {
     @Column(name = "AVATAR_URL")
     private String avatarUrl;
 
-    // RELACIONAMENTO
-
 }
