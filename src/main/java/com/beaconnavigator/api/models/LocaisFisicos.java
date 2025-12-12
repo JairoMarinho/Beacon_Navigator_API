@@ -1,10 +1,9 @@
 package com.beaconnavigator.api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.io.Serializable;
+import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tb_locais_fisicos")
-public class LocaisFisicos {
+public class LocaisFisicos implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +37,11 @@ public class LocaisFisicos {
     @Column(name = "UF")
     private String estado;
 
-    // RELACIONAMENTO
+    //Relacionamentos
 
+    @OneToOne(mappedBy = "local", cascade = CascadeType.ALL)
+    private Beacons beacon;
+
+    @OneToMany(mappedBy = "localFisico")
+    private List<Turmas> turmas;
 }
