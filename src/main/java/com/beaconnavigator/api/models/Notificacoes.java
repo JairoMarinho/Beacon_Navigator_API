@@ -28,17 +28,17 @@ public class Notificacoes implements Serializable {
     @Column(length = 50)
     private String tipo;
 
-    @Column(name = "foi_lida")
+    @Column(name = "Foi_lida")
     private Boolean foiLida = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "Usuario_id", nullable = false)
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "beacon_origem_id")
+    @JoinColumn(name = "Beacon_origem_id")
     private Beacons beaconOrigem;
 
-    @Column(name = "data_envio")
+    @Column(name = "Data_envio")
     private LocalDateTime dataEnvio = LocalDateTime.now();
 }
