@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -41,7 +40,5 @@ public class UsuarioPerfil {
     private String avatarUrl;
 
     // RELACIONAMENTO
-    @OneToOne
-    private Usuario usuario_id;
 
 }

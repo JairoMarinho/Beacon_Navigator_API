@@ -25,7 +25,7 @@ public class Usuario {
     private Long id;
 
     @NotBlank(message = "Campo nome completo é obrigatório")
-    @Column(nullable = false, name = "NOME_COMPLETO", unique = true)
+    @Column(nullable = false, name = "NOME_COMPLETO")
     private String nomeCompleto;
 
     @NotBlank(message = "Campo email é obrigatório")
@@ -39,6 +39,6 @@ public class Usuario {
     private String senha; // NUNCA GUARDAR SENHA EM TEXTO PURO
 
     // Relacionamento Perfil (Cascade ALL)
-    @OneToOne(mappedBy = "usuario_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne (cascade = CascadeType.ALL)
     private UsuarioPerfil userProfile;
 }
