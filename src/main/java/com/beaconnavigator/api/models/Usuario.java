@@ -1,10 +1,12 @@
 package com.beaconnavigator.api.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,8 +38,7 @@ public class Usuario {
     @Size(min = 6, max = 25)
     private String senha; // NUNCA GUARDAR SENHA EM TEXTO PURO
 
-    // Relacionamento 1:1 com Perfil (Cascade ALL para salvar junto)
-    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private usuarioPerfil userProfile;
-
+    // Relacionamento Perfil (Cascade ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UsuarioPerfil userProfile;
 }
