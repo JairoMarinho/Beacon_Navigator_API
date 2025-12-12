@@ -39,6 +39,6 @@ public class Usuario {
     private String senha; // NUNCA GUARDAR SENHA EM TEXTO PURO
 
     // Relacionamento Perfil (Cascade ALL)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "usuario_id", cascade = CascadeType.ALL, orphanRemoval = true)
     private UsuarioPerfil userProfile;
 }
