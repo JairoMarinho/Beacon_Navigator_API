@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tb_usuarios")
-public class usuario {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,12 @@ public class usuario {
     private String email;
 
     @NotBlank(message = "Campo senha obrigatório")
+    @Column(name = "SENHA_HASH", nullable = false)
     @Size(min = 6, max = 25)
     private String senha; // NUNCA GUARDAR SENHA EM TEXTO PURO
+
+    // Relacionamento 1:1 com Perfil (Cascade ALL para salvar junto)
+    // @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private usuarioPerfil userProfile;
 
 }

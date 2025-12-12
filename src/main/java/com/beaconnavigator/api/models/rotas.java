@@ -1,5 +1,5 @@
 package com.beaconnavigator.api.models;
 
-public class rotas {
+public class Rotas {
 
 }

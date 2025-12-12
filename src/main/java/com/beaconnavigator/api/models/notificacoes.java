@@ -1,5 +1,5 @@
 package com.beaconnavigator.api.models;
 
-public class notificacoes {
+public class Notificacoes {
 
 }
