@@ -21,7 +21,7 @@ public class Beacons implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
     private LocaisFisicos local;
 
