@@ -5,16 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.beaconnavigator.api.models.Rotas;
 import com.beaconnavigator.api.services.RotasService;
@@ -32,8 +23,7 @@ public class RotasController {
      */
     @GetMapping
     public ResponseEntity<List<Rotas>> listarTodas() {
-        List<Rotas> rotas = service.listarTodas();
-        return ResponseEntity.ok(rotas);
+        return ResponseEntity.ok(service.listarTodas());
     }
 
     /**
@@ -42,11 +32,9 @@ public class RotasController {
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
         try {
-            Rotas rota = service.buscarPorId(id);
-            return ResponseEntity.ok(rota);
+            return ResponseEntity.ok(service.buscarPorId(id));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -56,11 +44,11 @@ public class RotasController {
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Rotas rota) {
         try {
-            Rotas novaRota = service.criar(rota);
+            // CORREÇÃO: Mudamos de .criar() para .salvar() para bater com o Service novo
+            Rotas novaRota = service.salvar(rota); 
             return ResponseEntity.status(HttpStatus.CREATED).body(novaRota);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -73,8 +61,7 @@ public class RotasController {
             Rotas rotaAtualizada = service.atualizar(id, rota);
             return ResponseEntity.ok(rotaAtualizada);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -87,8 +74,7 @@ public class RotasController {
             service.deletar(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -110,8 +96,7 @@ public class RotasController {
             List<Rotas> rotas = service.listarRotasPorUsuario(usuarioId);
             return ResponseEntity.ok(rotas);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -124,8 +109,7 @@ public class RotasController {
             Rotas rotaAtualizada = service.alternarVisibilidade(id);
             return ResponseEntity.ok(rotaAtualizada);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
