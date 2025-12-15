@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.beaconnavigator.api.constants.StatusBeacon;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class Beacons implements Serializable {
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
+    @JsonManagedReference
     private LocaisFisicos local;
 
     @Enumerated(EnumType.STRING)

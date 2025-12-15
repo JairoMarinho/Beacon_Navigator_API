@@ -3,6 +3,8 @@ package com.beaconnavigator.api.models;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // <--- 1. O IMPORT QUE FALTAVA
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,11 +39,13 @@ public class LocaisFisicos implements Serializable {
     @Column(name = "UF")
     private String estado;
 
-    //Relacionamentos
+    // --- RELACIONAMENTOS ---
 
     @OneToOne(mappedBy = "local", cascade = CascadeType.ALL)
+    @JsonIgnore // <--- 2. A TRAVA DE SEGURANÇA AQUI (Evita o loop com Beacon)
     private Beacons beacon;
 
     @OneToMany(mappedBy = "localFisico")
+    @JsonIgnore // <--- 3. RECOMENDADO TAMBÉM (Evita loop futuro com Turmas)
     private List<Turmas> turmas;
 }

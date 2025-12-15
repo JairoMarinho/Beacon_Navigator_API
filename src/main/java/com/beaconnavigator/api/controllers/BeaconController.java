@@ -33,7 +33,7 @@ public class BeaconController {
         }
     }
 
-    // 3. CRIAR (POST)
+    // 3. CRIAR (POST) -> Usa o método 'salvar' simples
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Beacons beacon) {
         try {
@@ -43,13 +43,12 @@ public class BeaconController {
         }
     }
 
-    // 4. ATUALIZAR (PUT) - Este era o que estava faltando!
+    // 4. ATUALIZAR (PUT) -> Usa o método 'atualizar' seguro
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Beacons beaconAtualizado) {
         try {
-            // Garante que o ID do objeto seja o mesmo da URL
-            beaconAtualizado.setId(id);
-            return ResponseEntity.ok(service.salvar(beaconAtualizado));
+            // Aqui chamamos o método específico que trata a questão do Local NULL
+            return ResponseEntity.ok(service.atualizar(id, beaconAtualizado));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

@@ -1,6 +1,7 @@
 package com.beaconnavigator.api.models;
 
 import com.beaconnavigator.api.constants.StatusBeacon;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,14 +29,15 @@ public class UsuarioBeacon {
     // RELACIONAMENTO
     @ManyToOne
     @JoinColumn(name = "USUARIO_ID", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "userProfile"})
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "BEACON_ID", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "local"})
     private Beacons beacon;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "STATUS_BEACON")
     private StatusBeacon statusBeacon;
-
 }
