@@ -1,12 +1,14 @@
 package com.beaconnavigator.api;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-
-import java.awt.*;
-import java.net.URI;
 
 @SpringBootApplication
 public class BeaconNavigatorApplication {
@@ -40,7 +42,7 @@ public class BeaconNavigatorApplication {
 					runtime.exec("xdg-open " + url);
 				}
 			}
-		} catch (Exception e) {
+		} catch (IOException | URISyntaxException e) {
 			// Se falhar (ex: rodando em servidor headless), apenas ignora e segue a vida
 			System.err.println("⚠️ Não foi possível abrir o navegador automaticamente: " + e.getMessage());
 		}
