@@ -22,15 +22,16 @@ public class Beacons implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
-    @JsonManagedReference
-    private LocaisFisicos local;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusBeacon status;
 
     @Column(name = "ULTIMA_CONEXAO")
     private LocalDateTime ultimaConexao;
+
+    // RELACIONAMENTO
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
+    @JsonManagedReference
+    private LocaisFisicos local;
 }
