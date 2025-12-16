@@ -2,6 +2,11 @@ package com.beaconnavigator.api.controllers;
 
 import com.beaconnavigator.api.models.Beacons;
 import com.beaconnavigator.api.services.BeaconService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +39,15 @@ public class BeaconController {
     }
 
     // 3. CRIAR (POST) -> Usa o método 'salvar' simples
+    @Operation(summary = "Cadastrar novo Beacon", description = "Registra um beacon e o vincula a um local físico")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Exemplo de payload simplificado", required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+            {
+              "status": "ATIVADO",
+              "ultimaConexao": "2025-12-16T11:51:25.145",
+              "local": {
+                "id": 1
+              }
+            }""")))
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Beacons beacon) {
         try {
@@ -64,7 +78,7 @@ public class BeaconController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-    
+
     // 6. DELETAR (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
