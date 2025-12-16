@@ -3,9 +3,10 @@ package com.beaconnavigator.api.models;
 import java.io.Serializable;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // <--- 1. O IMPORT QUE FALTAVA
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class LocaisFisicos implements Serializable {
     private String cidade;
 
     @Column(name = "UF")
+    @Size(max = 2)
     private String estado;
 
     // --- RELACIONAMENTOS ---
