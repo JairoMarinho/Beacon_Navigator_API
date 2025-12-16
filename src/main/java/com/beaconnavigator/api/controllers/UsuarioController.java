@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios") // O endereço será: http://localhost:8080/usuarios
-@CrossOrigin(origins = "*") 
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     @Autowired
@@ -65,6 +65,18 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    // 6. ATUALIZAR PARCIAL (PATCH)
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> atualizarParcial(@PathVariable Long id, @RequestBody Usuario usuario) {
+        try {
+            Usuario atualizado = service.atualizarParcial(id, usuario);
+            return ResponseEntity.ok(atualizado);
+        } catch (RuntimeException e) {
+            // Pode ser 404 (não achou usuário) ou 400 (email duplicado, erro de validação)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

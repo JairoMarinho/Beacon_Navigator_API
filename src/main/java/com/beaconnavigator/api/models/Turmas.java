@@ -1,6 +1,5 @@
 package com.beaconnavigator.api.models;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -47,9 +46,9 @@ public class Turmas {
     private String sala;
 
     @Column(nullable = false)
-    private LocalDateTime textoHorario;
+    private String textoHorario;
 
-    //Relacionamentos
+    // Relacionamentos
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_fisico_id")
@@ -57,5 +56,4 @@ public class Turmas {
 
     @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TurmasMatriculas> matriculas;
-
 }

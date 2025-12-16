@@ -3,6 +3,7 @@ package com.beaconnavigator.api.models;
 import java.time.LocalDateTime;
 
 import com.beaconnavigator.api.constants.RoleMatricula;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,9 @@ public class TurmasMatriculas {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, name = "MATRICULA")
+    private String matricula;
+
     @Column(updatable = false) // não pode ser atualizado depois da criação
     private LocalDateTime dataCriacao;
 
@@ -34,6 +38,7 @@ public class TurmasMatriculas {
 
     @ManyToOne
     @JoinColumn(name = "turma_id", nullable = false)
+    @JsonIgnoreProperties("matriculas")
     private Turmas turma;
 
     @ManyToOne

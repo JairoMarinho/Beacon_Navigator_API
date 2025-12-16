@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "ponto_rotas", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "rota_id", "sequencia_numero" }) 
@@ -23,6 +25,7 @@ public class PontosRotas implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "Rota_id", nullable = false)
+    @JsonIgnoreProperties("pontos")
     private Rotas rota;
 
     @Column(name = "Sequencia_numero", nullable = false)
