@@ -30,7 +30,7 @@ public class Beacons implements Serializable {
     private LocalDateTime ultimaConexao;
 
     // RELACIONAMENTO
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
     @JsonManagedReference
     private LocaisFisicos local;
