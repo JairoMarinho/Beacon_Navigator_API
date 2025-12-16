@@ -1,7 +1,11 @@
 package com.beaconnavigator.api.controllers;
 
+import com.beaconnavigator.api.dtos.UsuarioCreateRequest;
 import com.beaconnavigator.api.models.Usuario;
 import com.beaconnavigator.api.services.UsuarioService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,13 +42,23 @@ public class UsuarioController {
     // 3. CRIAR NOVO USUÁRIO (POST)
     // Front espera 409 quando e-mail já existe
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> criar(@Valid @RequestBody UsuarioCreateRequest req) {
         try {
+            if (req.getConfirmarSenha() != null && !req.getSenha().equals(req.getConfirmarSenha())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("As senhas não conferem.");
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.setNomeCompleto(req.getNomeCompleto());
+            usuario.setEmail(req.getEmail());
+            usuario.setSenha(req.getSenha());
+
             Usuario novoUsuario = service.salvar(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+
         } catch (RuntimeException e) {
-            HttpStatus status = inferStatusFromMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
-            return ResponseEntity.status(status).body(e.getMessage());
+            // Se você já fez inferStatusFromMessage, pode reaproveitar aqui
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -97,12 +111,14 @@ public class UsuarioController {
      * Ideal: criar exceções específicas e um @ControllerAdvice.
      */
     private HttpStatus inferStatusFromMessage(String message, HttpStatus defaultStatus) {
-        if (message == null) return defaultStatus;
+        if (message == null)
+            return defaultStatus;
 
         String msg = message.toLowerCase();
 
         // conflito: e-mail já cadastrado / duplicado
-        if (msg.contains("email") && (msg.contains("já") || msg.contains("ja") || msg.contains("exist") || msg.contains("duplic"))) {
+        if (msg.contains("email")
+                && (msg.contains("já") || msg.contains("ja") || msg.contains("exist") || msg.contains("duplic"))) {
             return HttpStatus.CONFLICT; // 409
         }
 
