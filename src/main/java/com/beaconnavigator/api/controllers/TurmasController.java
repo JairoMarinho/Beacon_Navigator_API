@@ -1,13 +1,26 @@
 package com.beaconnavigator.api.controllers;
 
-import com.beaconnavigator.api.models.Turmas;
-import com.beaconnavigator.api.services.TurmasService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.beaconnavigator.api.models.Turmas;
+import com.beaconnavigator.api.services.TurmasService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 
 @RestController
 @RequestMapping("/turmas")
@@ -33,6 +46,19 @@ public class TurmasController {
         return ResponseEntity.ok(service.listarPorLocal(localId));
     }
 
+    @Operation(summary = "Criar nova turma", description = "Cadastra uma turma vinculada a uma sala (local físico)")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "JSON simplificado para criação de turma", required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+            {
+              "nomeTurma": "ADS - 4\u00ba Per\u00edodo",
+              "descricao": "Turma de Desenvolvimento Back-end",
+              "predio": "Faculdade Senac",
+              "andar": "14",
+              "sala": "1405",
+              "textoHorario": "2025-03-10T08:00:00",
+              "localFisico": {
+                "id": 1
+              }
+            }""")))
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Turmas turma) {
         try {
