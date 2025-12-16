@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios") // O endereço será: http://localhost:8080/usuarios
+@RequestMapping("/usuarios")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
@@ -36,13 +36,15 @@ public class UsuarioController {
     }
 
     // 3. CRIAR NOVO USUÁRIO (POST)
+    // Front espera 409 quando e-mail já existe
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Usuario usuario) {
         try {
             Usuario novoUsuario = service.salvar(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            HttpStatus status = inferStatusFromMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(status).body(e.getMessage());
         }
     }
 
@@ -53,7 +55,8 @@ public class UsuarioController {
             Usuario atualizado = service.atualizar(id, usuario);
             return ResponseEntity.ok(atualizado);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            HttpStatus status = inferStatusFromMessage(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(status).body(e.getMessage());
         }
     }
 
@@ -75,14 +78,39 @@ public class UsuarioController {
             Usuario atualizado = service.atualizarParcial(id, usuario);
             return ResponseEntity.ok(atualizado);
         } catch (RuntimeException e) {
-            // Pode ser 404 (não achou usuário) ou 400 (email duplicado, erro de validação)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            // 404 (não achou), 409 (email duplicado), 400 (validação)
+            HttpStatus status = inferStatusFromMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(status).body(e.getMessage());
         }
     }
 
-    // 6. ROTA DE TESTE (Para ver no navegador)
+    // ROTA DE TESTE
     @GetMapping("/teste")
-    public String testarApi() {
-        return "🚀 API do Beacon Navigator está RODANDO com sucesso! Pode continuar.";
+    public ResponseEntity<String> testarApi() {
+        return ResponseEntity.ok("API do Beacon Navigator está rodando com sucesso! Pode continuar.");
+    }
+
+    /**
+     * Heurística simples para mapear RuntimeException -> HTTP status
+     * (sem mexer no Service agora).
+     *
+     * Ideal: criar exceções específicas e um @ControllerAdvice.
+     */
+    private HttpStatus inferStatusFromMessage(String message, HttpStatus defaultStatus) {
+        if (message == null) return defaultStatus;
+
+        String msg = message.toLowerCase();
+
+        // conflito: e-mail já cadastrado / duplicado
+        if (msg.contains("email") && (msg.contains("já") || msg.contains("ja") || msg.contains("exist") || msg.contains("duplic"))) {
+            return HttpStatus.CONFLICT; // 409
+        }
+
+        // não encontrado
+        if (msg.contains("não encontrado") || msg.contains("nao encontrado") || msg.contains("not found")) {
+            return HttpStatus.NOT_FOUND; // 404
+        }
+
+        return defaultStatus;
     }
 }
