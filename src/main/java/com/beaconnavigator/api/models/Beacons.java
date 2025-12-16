@@ -6,7 +6,16 @@ import java.time.LocalDateTime;
 import com.beaconnavigator.api.constants.StatusBeacon;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,8 +39,8 @@ public class Beacons implements Serializable {
     private LocalDateTime ultimaConexao;
 
     // RELACIONAMENTO
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "local_beacon_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "local_beacon_id", nullable = false)
     @JsonManagedReference
     private LocaisFisicos local;
 }
