@@ -1,26 +1,19 @@
 package com.beaconnavigator.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.beaconnavigator.api.models.Usuario;
+import com.beaconnavigator.api.repository.TurmasMatriculasRepository;
+import com.beaconnavigator.api.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.beaconnavigator.api.models.Turmas;
 import com.beaconnavigator.api.services.TurmasService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
+import com.beaconnavigator.api.models.TurmasMatriculas;
 
 @RestController
 @RequestMapping("/turmas")
@@ -29,6 +22,27 @@ public class TurmasController {
 
     @Autowired
     private TurmasService service;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private TurmasMatriculasRepository matriculasRepository;
+
+    // --- NOVO ENDPOINT: MINHAS TURMAS ---
+    @GetMapping("/me")
+    public ResponseEntity<List<Turmas>> minhasTurmas() {
+        Usuario aluno = usuarioService.buscarUsuarioLogado();
+
+        // Busca matrículas do aluno e extrai as turmas
+        List<Turmas> minhas = matriculasRepository.findByUsuarioId(aluno.getId())
+                .stream()
+                .map(TurmasMatriculas::getTurma)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(minhas);
+    }
+    // ------------------------------------
 
     @GetMapping
     public ResponseEntity<List<Turmas>> listarTodas() {
@@ -40,25 +54,11 @@ public class TurmasController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // Ex: /turmas/sala/1 -> Traz todas as aulas do Laboratório 1
     @GetMapping("/sala/{localId}")
     public ResponseEntity<List<Turmas>> listarPorSala(@PathVariable Long localId) {
         return ResponseEntity.ok(service.listarPorLocal(localId));
     }
 
-    @Operation(summary = "Criar nova turma", description = "Cadastra uma turma vinculada a uma sala (local físico)")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "JSON simplificado para criação de turma", required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-            {
-              "nomeTurma": "ADS - 4\u00ba Per\u00edodo",
-              "descricao": "Turma de Desenvolvimento Back-end",
-              "predio": "Faculdade Senac",
-              "andar": "14",
-              "sala": "1405",
-              "textoHorario": "2025-03-10T08:00:00",
-              "localFisico": {
-                "id": 1
-              }
-            }""")))
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Turmas turma) {
         try {

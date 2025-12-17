@@ -1,18 +1,19 @@
 package com.beaconnavigator.api.controllers;
 
 import com.beaconnavigator.api.models.Beacons;
+import com.beaconnavigator.api.models.Usuario;
+import com.beaconnavigator.api.models.UsuarioBeacon;
+import com.beaconnavigator.api.repository.UsuarioBeaconRepository;
 import com.beaconnavigator.api.services.BeaconService;
-
+import com.beaconnavigator.api.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/beacons")
@@ -22,32 +23,37 @@ public class BeaconController {
     @Autowired
     private BeaconService service;
 
-    // 1. LISTAR TODOS (GET)
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private UsuarioBeaconRepository usuarioBeaconRepository;
+
+    // --- NOVO ENDPOINT: MEUS BEACONS ---
+    @GetMapping("/me")
+    public ResponseEntity<List<Beacons>> meusBeacons() {
+        Usuario usuario = usuarioService.buscarUsuarioLogado();
+        
+        // Busca na tabela de relacionamento (UsuarioBeacon) e extrai a lista de Beacons
+        List<Beacons> meusBeacons = usuarioBeaconRepository.findAll().stream()
+                .filter(ub -> ub.getUsuario().getId().equals(usuario.getId()))
+                .map(UsuarioBeacon::getBeacon)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(meusBeacons);
+    }
+    // -----------------------------------
+
     @GetMapping
     public ResponseEntity<List<Beacons>> listarTodos() {
         return ResponseEntity.ok(service.listarTodos());
     }
 
-    // 2. BUSCAR POR ID (GET)
     @GetMapping("/{id}")
     public ResponseEntity<Beacons> buscarPorId(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(service.buscarPorId(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // 3. CRIAR (POST) -> Usa o método 'salvar' simples
-    @Operation(summary = "Cadastrar novo Beacon", description = "Registra um beacon e o vincula a um local físico")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Exemplo de payload simplificado", required = true, content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-            {
-              "status": "ATIVADO",
-              "ultimaConexao": "2025-12-16T11:51:25.145",
-              "local": {
-                "id": 1
-              }
-            }""")))
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Beacons beacon) {
         try {
@@ -57,36 +63,23 @@ public class BeaconController {
         }
     }
 
-    // 4. ATUALIZAR (PUT) -> Usa o método 'atualizar' seguro
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Beacons beaconAtualizado) {
         try {
-            // Aqui chamamos o método específico que trata a questão do Local NULL
             return ResponseEntity.ok(service.atualizar(id, beaconAtualizado));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // 5. VINCULAR LOCAL (PUT ESPECIAL)
     @PutMapping("/{beaconId}/vincular-local/{localId}")
     public ResponseEntity<?> vincularLocal(@PathVariable Long beaconId, @PathVariable Long localId) {
-        try {
-            Beacons beaconAtualizado = service.vincularLocal(beaconId, localId);
-            return ResponseEntity.ok(beaconAtualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok(service.vincularLocal(beaconId, localId));
     }
 
-    // 6. DELETAR (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
-        try {
-            service.deletar(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
