@@ -1,6 +1,7 @@
 package com.beaconnavigator.api.controllers;
 
 import com.beaconnavigator.api.dtos.UsuarioCreateRequest;
+import com.beaconnavigator.api.dtos.UsuarioChangePasswordRequest;
 import com.beaconnavigator.api.models.Usuario;
 import com.beaconnavigator.api.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService service;
 
-    // --- NOVOS ENDPOINTS PESSOAIS ---
+    // --- ENDPOINTS PESSOAIS ---
 
     // Pegar MEU perfil
     @GetMapping("/me")
@@ -31,8 +32,19 @@ public class UsuarioController {
     @PutMapping("/me")
     public ResponseEntity<Usuario> atualizarMeuPerfil(@RequestBody Usuario dadosAtualizados) {
         Usuario eu = service.buscarUsuarioLogado();
-        // Chama o serviço de atualização passando o ID do usuário logado
         return ResponseEntity.ok(service.atualizar(eu.getId(), dadosAtualizados));
+    }
+
+    // NOVO: Alterar MINHA senha com segurança
+    @PutMapping("/me/senha")
+    public ResponseEntity<?> alterarMinhaSenha(@RequestBody @Valid UsuarioChangePasswordRequest req) {
+        try {
+            service.alterarSenhaUsuarioLogado(req);
+            return ResponseEntity.noContent().build(); // 204
+        } catch (RuntimeException e) {
+            // você pode especializar isso (401/400) conforme sua regra
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     // --------------------------------
