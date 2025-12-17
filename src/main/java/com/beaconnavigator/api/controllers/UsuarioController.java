@@ -41,33 +41,15 @@ public class UsuarioController {
 
     // 3. CRIAR NOVO USUÁRIO (POST)
     // Front espera 409 quando e-mail já existe
-    // Substitua o método criar() no UsuarioController por este:
 
     @PostMapping
-    public ResponseEntity<?> criar(@Valid @RequestBody UsuarioCreateRequest req) {
-        try {
-            // Validação de senha
-            if (req.getConfirmarSenha() != null && !req.getSenha().equals(req.getConfirmarSenha())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("As senhas não conferem.");
-            }
+    // Certifique-se de importar o UsuarioCreateRequest e o @Valid
+    public ResponseEntity<Usuario> criar(@RequestBody @Valid UsuarioCreateRequest dados) {
 
-            // Monta o usuário
-            Usuario usuario = new Usuario();
-            usuario.setNomeCompleto(req.getNomeCompleto());
-            usuario.setEmail(req.getEmail());
-            usuario.setSenha(req.getSenha());
+        // Agora o Service cuida de tudo (criar perfil, criptografar senha, salvar)
+        Usuario novoUsuario = service.salvar(dados);
 
-            // NOVO: Se veio userProfile no JSON, vincula
-            if (req.getUserProfile() != null) {
-                usuario.setUserProfile(req.getUserProfile());
-            }
-
-            Usuario novoUsuario = service.salvar(usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
     }
 
     // 4. ATUALIZAR (PUT)

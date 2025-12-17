@@ -1,6 +1,5 @@
 package com.beaconnavigator.api.dtos;
 
-import com.beaconnavigator.api.models.UsuarioPerfil;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -24,10 +23,17 @@ public class UsuarioCreateRequest {
     @JsonAlias({ "senha", "password" })
     private String senha;
 
-    @JsonAlias({ "confirmarSenha", "confirmPassword" })
-    private String confirmarSenha;
+    // --- MUDANÇA AQUI: Campos soltos em vez do objeto UsuarioPerfil ---
 
-    // NOVO CAMPO: Aceita o perfil do usuário
-    @JsonAlias({ "userProfile", "perfil" })
-    private UsuarioPerfil userProfile;
+    @JsonAlias({ "biografia", "bio" }) // Aceita "bio" do front ou "biografia"
+    private String biografia;
+
+    @JsonAlias("telefone")
+    private String telefone;
+
+    @JsonAlias({ "cidade", "location" }) // Aceita "location" do front
+    private String cidade;
+
+    @JsonAlias({ "estado", "state" }) // Aceita "state" do front
+    private String estado;
 }
