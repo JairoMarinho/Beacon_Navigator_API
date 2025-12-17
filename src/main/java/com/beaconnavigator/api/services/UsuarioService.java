@@ -1,11 +1,12 @@
 package com.beaconnavigator.api.services;
 
 import com.beaconnavigator.api.dtos.UsuarioCreateRequest;
+import com.beaconnavigator.api.dtos.UsuarioChangePasswordRequest;
 import com.beaconnavigator.api.models.Usuario;
 import com.beaconnavigator.api.models.UsuarioPerfil;
 import com.beaconnavigator.api.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder; // Importante
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,12 +24,58 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // --- NOVO MÉTODO: Pega o usuário do Token JWT ---
+    // --- Pega o usuário do Token JWT ---
     public Usuario buscarUsuarioLogado() {
-        // O e-mail é extraído automaticamente do contexto de segurança do Spring Security
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return repository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário logado não encontrado"));
+    }
+
+    // --- NOVO: Alterar senha do usuário logado com segurança ---
+    public void alterarSenhaUsuarioLogado(UsuarioChangePasswordRequest req) {
+        if (req == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requisição inválida");
+        }
+
+        String senhaAtual = req.getSenhaAtual();
+        String novaSenha = req.getNovaSenha();
+        String confirmacao = req.getConfirmacao();
+
+        if (senhaAtual == null || senhaAtual.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual é obrigatória");
+        }
+        if (novaSenha == null || novaSenha.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nova senha é obrigatória");
+        }
+        if (confirmacao == null || confirmacao.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirmação é obrigatória");
+        }
+        if (!novaSenha.equals(confirmacao)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirmação da nova senha não confere");
+        }
+        if (novaSenha.length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nova senha deve ter no mínimo 8 caracteres");
+        }
+
+        Usuario eu = buscarUsuarioLogado();
+
+        // Valida senha atual (comparando hash)
+        boolean senhaConfere = passwordEncoder.matches(senhaAtual, eu.getSenha());
+        if (!senhaConfere) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha atual incorreta");
+        }
+
+        // Evita trocar para a mesma senha (opcional, mas recomendado)
+        if (passwordEncoder.matches(novaSenha, eu.getSenha())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A nova senha não pode ser igual à senha atual");
+        }
+
+        eu.setSenha(passwordEncoder.encode(novaSenha));
+        repository.save(eu);
+
+        // Recomendado (opcional):
+        // - invalidar tokens/sessões anteriores
+        // (depende de como seu JWT está implementado)
     }
 
     public List<Usuario> listarTodos() {
@@ -73,18 +120,24 @@ public class UsuarioService {
         if (usuario.getNomeCompleto() != null) {
             existente.setNomeCompleto(usuario.getNomeCompleto());
         }
-        
+
         // Atualiza campos do perfil se existirem
         if (usuario.getUserProfile() != null) {
             if (existente.getUserProfile() == null) {
                 existente.setUserProfile(new UsuarioPerfil());
             }
-            if (usuario.getUserProfile().getBiografia() != null) existente.getUserProfile().setBiografia(usuario.getUserProfile().getBiografia());
-            if (usuario.getUserProfile().getTelefone() != null) existente.getUserProfile().setTelefone(usuario.getUserProfile().getTelefone());
-            if (usuario.getUserProfile().getLocalizacao() != null) existente.getUserProfile().setLocalizacao(usuario.getUserProfile().getLocalizacao());
-            if (usuario.getUserProfile().getUf() != null) existente.getUserProfile().setUf(usuario.getUserProfile().getUf());
+            if (usuario.getUserProfile().getBiografia() != null)
+                existente.getUserProfile().setBiografia(usuario.getUserProfile().getBiografia());
+            if (usuario.getUserProfile().getTelefone() != null)
+                existente.getUserProfile().setTelefone(usuario.getUserProfile().getTelefone());
+            if (usuario.getUserProfile().getLocalizacao() != null)
+                existente.getUserProfile().setLocalizacao(usuario.getUserProfile().getLocalizacao());
+            if (usuario.getUserProfile().getUf() != null)
+                existente.getUserProfile().setUf(usuario.getUserProfile().getUf());
         }
 
+        // OBS: Por segurança, recomendo REMOVER a troca de senha daqui
+        // e usar apenas /usuarios/me/senha.
         if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
             existente.setSenha(passwordEncoder.encode(usuario.getSenha()));
         }
@@ -93,7 +146,7 @@ public class UsuarioService {
     }
 
     public Usuario atualizarParcial(Long id, Usuario usuarioParcial) {
-        return atualizar(id, usuarioParcial); // Reutilizando logica simples
+        return atualizar(id, usuarioParcial);
     }
 
     public void deletar(Long id) {
