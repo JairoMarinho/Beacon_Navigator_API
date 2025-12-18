@@ -24,11 +24,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // boa prática: garantir contexto limpo por request
+        // (o Spring normalmente gerencia isso, mas não custa reforçar)
+        // SecurityContextHolder.clearContext();
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -36,12 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(PREFIX.length()).trim();
 
             if (jwtService.isTokenValid(token)) {
-                String subject = jwtService.extractSubject(token); // email
+                String subject = jwtService.extractSubject(token);
 
                 var auth = new UsernamePasswordAuthenticationToken(
-                        subject,              // principal = email
-                        null,
-                        Collections.emptyList()
+                    subject,
+                    null,
+                    Collections.emptyList()
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -57,12 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
 
-        // Rotas públicas
         if ("/auth/login".equals(path)) return true;
         if ("/usuarios".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) return true;
         if ("/usuarios/teste".equals(path)) return true;
 
-        // Swagger
         if (path.startsWith("/swagger-ui")) return true;
         if (path.startsWith("/v3/api-docs")) return true;
 

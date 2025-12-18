@@ -13,23 +13,25 @@ public class CorsConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+        CorsConfiguration c = new CorsConfiguration();
 
-        // Em produção, restrinja para o domínio do seu front
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Troque pelo(s) domínio(s) do seu front (exemplos):
+        // c.setAllowedOrigins(List.of("https://app.seudominio.com"));
+        // Para dev local, você pode incluir:
+        // c.setAllowedOrigins(List.of("http://localhost:3000"));
 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        c.setAllowedOrigins(List.of(
+            "http://localhost:3000"
+        ));
 
-        // Se quiser expor headers para o front ler
-        config.setExposedHeaders(List.of("Authorization"));
-
-        // Se você não usa cookies/sessão, deixe false (recomendado para Bearer)
-        config.setAllowCredentials(false);
+        c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        c.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        c.setExposedHeaders(List.of("Location"));
+        c.setAllowCredentials(false); // JWT Bearer não precisa de cookies; manter false é mais seguro.
+        c.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
+        source.registerCorsConfiguration("/**", c);
         return source;
     }
 }
