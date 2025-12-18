@@ -6,7 +6,6 @@ import com.beaconnavigator.api.models.UsuarioBeacon;
 import com.beaconnavigator.api.repository.UsuarioBeaconRepository;
 import com.beaconnavigator.api.services.BeaconService;
 import com.beaconnavigator.api.services.UsuarioService;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
