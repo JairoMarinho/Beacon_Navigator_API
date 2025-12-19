@@ -68,6 +68,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/usuarios/teste").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+
 
                 // Todo o resto protegido
                 .anyRequest().authenticated()
