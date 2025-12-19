@@ -33,11 +33,13 @@ public class Usuario {
     @Column(nullable = false, name = "EMAIL", unique = true)
     private String email;
 
-    
     @NotBlank(message = "Campo senha obrigatório")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "SENHA_HASH", nullable = false, length = 255)
     private String senha;
+
+    @Column(name = "AVATAR_URL", length = 500)
+    private String avatarUrl;
 
     // Relacionamento Perfil (Cascade ALL)
     @OneToOne(cascade = CascadeType.ALL)
