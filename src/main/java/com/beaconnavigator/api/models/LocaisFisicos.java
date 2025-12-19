@@ -5,7 +5,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,9 +50,9 @@ public class LocaisFisicos implements Serializable {
 
     // --- RELACIONAMENTOS ---
 
-    @OneToOne(mappedBy = "local", cascade = CascadeType.ALL)
-    @JsonIgnore // <--- 2. A TRAVA DE SEGURANÇA AQUI (Evita o loop com Beacon)
-    private Beacons beacon;
+    @OneToMany(mappedBy = "local", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Beacons> beacons;
 
     @OneToMany(mappedBy = "localFisico")
     @JsonIgnore // <--- 3. RECOMENDADO TAMBÉM (Evita loop futuro com Turmas)
