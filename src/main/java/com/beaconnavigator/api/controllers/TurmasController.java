@@ -17,7 +17,6 @@ import com.beaconnavigator.api.models.TurmasMatriculas;
 
 @RestController
 @RequestMapping("/turmas")
-@CrossOrigin(origins = "*")
 public class TurmasController {
 
     @Autowired

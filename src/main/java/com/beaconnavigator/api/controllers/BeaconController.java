@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/beacons")
-@CrossOrigin(origins = "*")
 public class BeaconController {
 
     @Autowired

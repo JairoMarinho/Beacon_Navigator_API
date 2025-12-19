@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 
 @RestController
 @RequestMapping("/rotas")
-@CrossOrigin(origins = "*")
 public class RotasController {
 
     @Autowired

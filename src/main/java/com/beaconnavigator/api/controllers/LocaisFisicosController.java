@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/locais")
-@CrossOrigin(origins = "*")
 public class LocaisFisicosController {
 
     @Autowired
